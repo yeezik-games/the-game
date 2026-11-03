@@ -560,9 +560,13 @@ async function scanQR(){
 }
 
 // ===== Versione e patch notes =====
-const VERSION='2.0';
+const VERSION='2.1';
 // tipi di voce: n = nuovo, m = migliorato, c = corretto
 const NOTES=[
+  {v:'2.1',d:'3 novembre 2026',items:[
+    ['c','Sfondo di fuoco senza la riga orizzontale e fermo dietro i contenuti anche su iPhone'],
+    ['n','Nuova icona e favicon']
+  ]},
   {v:'2.0',d:'3 novembre 2026',items:[
     ['n','Nuova casa nello stile di Yeezik Games, con i colori del gioco vero'],
     ['n','Account, nome utente, amici online e inviti al tavolo con un tocco'],

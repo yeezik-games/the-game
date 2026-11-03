@@ -572,11 +572,10 @@ body.has-tabs #toast{bottom:calc(92px + env(safe-area-inset-bottom))}
 
 /* ===== The Game: look della scatola (fuoco, carte direzione nere, carte fuoco blu) ===== */
 :root{--disp:"Oswald","Arial Narrow",Impact,sans-serif;--hand:"Caveat","Comic Sans MS",cursive}
-body{background:
-  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='4' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.4 1.05'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23s)'/%3E%3C/svg%3E"),
-  radial-gradient(90% 50% at 50% -5%,#000 0%,rgba(0,0,0,.75) 35%,transparent 70%),
-  radial-gradient(130% 85% at 50% 115%,#f2852a 0%,#d9471a 30%,#9b1b0e 58%,#4a0a06 82%,#1c0503 100%);
-  background-attachment:fixed;background-size:600px 600px,100% 100%,100% 100%;background-color:var(--bg)}
+html,body{background:var(--bg)}
+.bg{background:radial-gradient(90% 50% at 50% -5%,#000 0%,rgba(0,0,0,.75) 35%,transparent 70%),radial-gradient(130% 85% at 50% 115%,#f2852a 0%,#d9471a 30%,#9b1b0e 58%,#4a0a06 82%,#1c0503 100%)}
+.bg::before{content:"";position:absolute;inset:0;z-index:1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='s' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0117' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.4 1.05'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23s)'/%3E%3C/svg%3E") 0 0/512px 512px repeat;opacity:.9}
+.bg b{z-index:0}.bg i{z-index:2}
 .bg b{opacity:.28}
 .bg i{width:3px;height:3px;background:#ffb347;box-shadow:0 0 6px #ff6a1f;animation:ember 6s linear infinite}
 @keyframes ember{0%{opacity:0;transform:translateY(0)}15%{opacity:.9}100%{opacity:0;transform:translateY(-38vh) translateX(3vw)}}
@@ -721,11 +720,11 @@ body.ingame .ver{display:none}
 <nav id="tabs" aria-label="Navigazione"></nav>
 <div id="dock" class="dock"></div>
 <div id="toast"></div>
-<script src="js/core.js?v=2.0"></script>
-<script src="js/sfx.js?v=2.0"></script>
-<script src="js/game.js?v=2.0"></script>
-<script src="js/app.js?v=2.0"></script>
-<script src="js/local.js?v=2.0"></script>
-<script src="js/share.js?v=2.0"></script>
+<script src="js/core.js?v=2.1"></script>
+<script src="js/sfx.js?v=2.1"></script>
+<script src="js/game.js?v=2.1"></script>
+<script src="js/app.js?v=2.1"></script>
+<script src="js/local.js?v=2.1"></script>
+<script src="js/share.js?v=2.1"></script>
 </body>
 </html>
