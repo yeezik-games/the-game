@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="115%" r="115%">
+      <stop offset="0" stop-color="#ffb347"/><stop offset=".3" stop-color="#ff6a1f"/><stop offset=".58" stop-color="#b3220e"/><stop offset=".85" stop-color="#4a0a06"/><stop offset="1" stop-color="#1c0503"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="58%" r="62%">
+      <stop offset="0" stop-color="#ffe08a"/><stop offset=".3" stop-color="#ff8a2e"/><stop offset=".62" stop-color="#a92a0f"/><stop offset="1" stop-color="#1a0503"/>
+    </radialGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2=".3" y2="1"><stop offset="0" stop-color="#231818"/><stop offset="1" stop-color="#060404"/></linearGradient>
+    <linearGradient id="arr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4a3a"/><stop offset=".55" stop-color="#e3222f"/><stop offset="1" stop-color="#9a0d14"/></linearGradient>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".6"/></filter>
+    <filter id="rg" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="#000" opacity=".25"/>
+  <!-- carta numerata arancio dietro -->
+  <g transform="rotate(14 330 270)" filter="url(#sh)">
+    <rect x="236" y="104" width="188" height="264" rx="26" fill="url(#glow)" stroke="#000" stroke-width="6"/>
+    <rect x="250" y="118" width="160" height="236" rx="18" fill="none" stroke="#ffb066" stroke-opacity=".55" stroke-width="5"/>
+  </g>
+  <!-- carta direzione nera davanti -->
+  <g transform="rotate(-9 200 280)" filter="url(#sh)">
+    <rect x="96" y="132" width="210" height="294" rx="28" fill="url(#dark)" stroke="#000" stroke-width="6"/>
+    <rect x="112" y="148" width="178" height="262" rx="19" fill="none" stroke="#e3222f" stroke-width="7"/>
+    <path d="M201 178 L271 268 L230 268 L230 382 L172 382 L172 268 L131 268 Z" fill="#ff2a2a" filter="url(#rg)" opacity=".8"/>
+    <path d="M201 178 L271 268 L230 268 L230 382 L172 382 L172 268 L131 268 Z" fill="url(#arr)"/>
+  </g>
+</svg>
