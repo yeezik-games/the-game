@@ -7,4 +7,4 @@ Il gioco di carte cooperativo da giocare tra amici: una sola squadra contro 98 c
 - Account, amici, inviti e statistiche condivisi con gli altri giochi Yeezik Games (Supabase "yeezik-games", tabella `thegame_results`).
 - Varianti: versione per professionisti ed espansione On Fire.
 
-Gioca qui: https://yeezikdev.github.io/the-game/
+Gioca qui: https://yeezik-games.github.io/the-game/

@@ -560,9 +560,12 @@ async function scanQR(){
 }
 
 // ===== Versione e patch notes =====
-const VERSION='2.2';
+const VERSION='2.3';
 // tipi di voce: n = nuovo, m = migliorato, c = corretto
 const NOTES=[
+  {v:'2.3',d:'5 novembre 2026',items:[
+    ['c','Nell’immagine e nel testo del risultato condiviso c’è il nuovo indirizzo del sito']
+  ]},
   {v:'2.2',d:'5 novembre 2026',items:[
     ['n','A inizio partita scegliete voi chi inizia: votate la persona con la mano migliore, oppure a caso']
   ]},
