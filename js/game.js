@@ -19,11 +19,22 @@ const TG={
     const deck=[];for(let i=2;i<=99;i++)deck.push(i);
     const d=shuffle(deck),hands={},stats={};
     g.order.forEach(id=>{hands[id]=d.splice(0,hs).sort((a,b)=>a-b);stats[id]={played:0,backs:0}});
-    Object.assign(g,{phase:'play',result:null,hands,deck:d,turn:Math.floor(Math.random()*n),turnNo:1,played:[],signals:{},stats,
+    Object.assign(g,{phase:n===1?'play':'choose',votes:{},result:null,hands,deck:d,turn:0,turnNo:1,played:[],signals:{},stats,
       piles:[{dir:'up',cards:[]},{dir:'up',cards:[]},{dir:'down',cards:[]},{dir:'down',cards:[]}]});
-    g.log=[n===1?'Partita in solitario: 8 carte in mano.':'Si parte! Inizia '+TG.nm(g,TG.cur(g))+'.'];
+    g.log=[n===1?'Partita in solitario: 8 carte in mano.':'Carte distribuite: decidete chi inizia.'];
     return g;
   },
+  // fine della scelta: id di chi inizia, oppure null = a caso
+  begin(g,id){
+    if(g.phase!=='choose')return false;
+    let i=id?g.order.indexOf(id):-1;
+    const rnd=i<0;if(rnd)i=Math.floor(Math.random()*g.order.length);
+    g.turn=i;g.phase='play';g.votes={};
+    g.log=['Si parte! Inizia '+TG.nm(g,TG.cur(g))+(rnd?' (scelto a caso).':'.')];
+    return true;
+  },
+  // voto unanime? restituisce l'id scelto da tutti, altrimenti null
+  agreed(g){const v=g.order.map(id=>(g.votes||{})[id]);return v.every(x=>x&&x===v[0])?v[0]:null},
   finish(g,reason,pid){
     g.phase='end';g.played=[];
     const r=TG.remaining(g);g.result={reason,remaining:r,won:reason!=='fire'&&r===0};
@@ -131,6 +142,7 @@ function removeFromGame(S,id){
   if(S.phase==='play'&&TG.cur(S)===id)while(S.played.length)TG.undo(S,id);
   S.deck=shuffle(S.deck.concat(S.hands[id]||[]));delete S.hands[id];
   S.order.splice(idx,1);Object.values(S.signals||{}).forEach(m=>delete m[id]);
+  if(S.votes){delete S.votes[id];Object.keys(S.votes).forEach(k=>{if(S.votes[k]===id)delete S.votes[k]})}
   if(!S.order.length){S.phase='lobby';return}
   if(idx<S.turn)S.turn--;
   S.turn%=S.order.length;
@@ -148,6 +160,8 @@ function handle(a){
         S.players.push({id:a.from,name,color:pickColor(S,a.color),uid})}break}
     case 'opts':if(isH&&S.phase==='lobby'){S.opts={pro:!!a.pro,fire:!!a.fire}}else ok=false;break;
     case 'start':if(isH&&S.phase==='lobby'&&S.players.length>=1)startMatch(S,S.players.map(x=>x.id));else ok=false;break;
+    case 'vote':if(S.phase==='choose'&&S.order.includes(a.from)&&S.order.includes(a.id)){S.votes=S.votes||{};S.votes[a.from]=S.votes[a.from]===a.id?null:a.id;const w=TG.agreed(S);if(w)TG.begin(S,w)}else ok=false;break;
+    case 'begin':if(isH&&S.phase==='choose')TG.begin(S,S.order.includes(a.id)?a.id:null);else ok=false;break;
     case 'play':ok=turnOk&&TG.play(S,a.from,+a.pi,+a.c);break;
     case 'undo':ok=turnOk&&TG.undo(S,a.from);break;
     case 'end':ok=turnOk&&TG.end(S,a.from);break;
@@ -225,6 +239,10 @@ const VIEWS={
     <div id="optbox"></div>
     ${isHost?`<button class="btn primary big" data-a="start" id="startBtn" style="margin-top:18px">Inizia la partita</button><p class="hint" id="startHint" style="margin-top:10px"></p>`:`<p class="wait" style="margin-top:18px">In attesa che l'host avvii la partita…</p>`}`,
   play:()=>`<div id="tablebox"></div>`,
+  choose:()=>`<div class="choose"><p class="lbl tc">Carte distribuite</p><h1 class="headline tc">Chi inizia?</h1>
+    <p class="sub tc">Guardate le vostre carte e decidete insieme chi ha la mano migliore. Senza dire i numeri!</p>
+    <div id="votebox" class="flist"></div><div id="choosehint"></div>
+    ${isHost?`<button type="button" class="btn ghost big" data-a="begin" data-id="" style="margin-top:14px">🎲 Scegli a caso</button>`:''}</div>`,
   end:()=>{
     const S=state,r=S.result||{remaining:0},[t,sub]=TG.verdict(r),pct=Math.round((98-r.remaining)/98*100);
     return`<div class="bigres ${r.won?'win':''} ${r.reason==='fire'?'burn':''}"><p class="lbl">${r.won?'Carte rimaste':'Carte non calate'}</p><div class="n">${r.remaining}</div><h2>${esc(t)}</h2><p>${esc(sub)}</p>
@@ -255,7 +273,8 @@ function render(){
     const prevPhase=lastKey.split('#')[0];lastKey=key;
     $('#app').innerHTML=(VIEWS[S.phase]||VIEWS.lobby)();enterAnim();
     const qr=$('#qr');if(qr&&window.QRCode){try{new QRCode(qr,{text:inviteLink(),width:150,height:150,colorDark:'#1c0503',colorLight:'#ffffff'})}catch(e){}}
-    if(S.phase==='play'&&prevPhase!=='play'){lastTops=[];lastHand=null;sel=null;buzz(30);SFX.whoosh()}
+    if(S.phase==='choose'){lastTops=[];lastHand=null;sel=null;buzz(30);SFX.whoosh()}
+    if(S.phase==='play'&&prevPhase!=='play'){lastTops=[];sel=null;if(prevPhase!=='choose'){lastHand=null;buzz(30);SFX.whoosh()}else SFX.chime()}
     if(S.phase==='end'&&prevPhase!=='end'){const r=S.result||{};if(r.won){confetti(220,600);SFX.fanfare(.6);setTimeout(()=>confetti(140),2000)}else if(r.remaining<10&&r.reason!=='fire'){confetti(120,600);SFX.fanfare(.6)}else SFX.drum(0,.8);if(window.recordMatch)recordMatch()}
   }
   updateDyn();
@@ -266,7 +285,7 @@ function updateDyn(){
   const pl=$('#plist');if(pl){pl.innerHTML=S.players.map(p=>{const isNew=!seenPlayers.has(p.id);return`<div class="pl ${online.has(p.id)?'':'off'} ${isNew?'new':''}">${av(p)}<span>${nm(p)}</span>${p.id===S.hostId?'<em>host</em>':''}${p.id===me.id?'<em>tu</em>':''}${isHost&&p.id!==S.hostId?`<button class="x" data-a="kick" data-id="${p.id}">rimuovi</button>`:''}</div>`}).join('');if(seenPlayers.size&&S.players.some(p=>!seenPlayers.has(p.id)&&p.id!==me.id))SFX.join();S.players.forEach(p=>seenPlayers.add(p.id))}
   const pc=$('#pcount');if(pc)pc.textContent=`Giocatori · ${S.players.length}/${MAXP}`;
   const ob=$('#optbox');if(ob)ob.innerHTML=optsHtml(S.opts||{},isHost,'data-a');
-  const sb=$('#startBtn');if(sb){const n=S.players.length;sb.textContent=n===1?'Gioca in solitario':`Inizia la partita (${n} giocatori)`;const h=$('#startHint');if(h)h.textContent=n===1?'Da solo giochi con 8 carte in mano. Aspetta gli amici o inizia.':'Chi inizia viene scelto a caso, poi si va in ordine.'}
+  const sb=$('#startBtn');if(sb){const n=S.players.length;sb.textContent=n===1?'Gioca in solitario':`Inizia la partita (${n} giocatori)`;const h=$('#startHint');if(h)h.textContent=n===1?'Da solo giochi con 8 carte in mano. Aspetta gli amici o inizia.':'Dopo la distribuzione scegliete insieme chi inizia.'}
   const rb=$('#rematchBtn');if(rb){const votes=(S.rematch||[]).filter(id=>S.players.some(p=>p.id===id)),mine=votes.includes(me.id),others=votes.filter(v=>v!==me.id).length;
     rb.disabled=!isHost&&mine;rb.textContent=isHost?(others?`🔁 Rivincita · ${others} ${others===1?'pronto':'pronti'}`:'🔁 Rivincita'):mine?'Pronto! Aspetto gli altri…':'🔁 Rivincita';
     const rs=$('#rematchst');if(rs)rs.innerHTML=votes.length?`<p class="hint" style="margin:10px 0 0">Vogliono la rivincita:</p><div class="chips" style="margin-top:6px">${votes.map(id=>{const p=playerOf(id);return`<span class="chip done">${av(p,'sm')}${nm(p)}</span>`}).join('')}</div>`:''}
@@ -281,6 +300,12 @@ function updateDyn(){
     else{d=handHtml(S,me.id,myTurn);if(myTurn)d+=turnActions(S,me.id)}
     setDock(d);
     const tk=cur+'#'+S.turnNo;if(tk!==prevTurnKey){if(prevTurnKey&&myTurn){buzz([30,50,30]);SFX.chime()}prevTurnKey=tk}
+  }else if(S.phase==='choose'){
+    const playing=S.order.includes(me.id),votes=S.votes||{},mine=votes[me.id];
+    const vb=$('#votebox');if(vb)vb.innerHTML=S.order.map(id=>{const p=playerOf(id),who=S.order.filter(v=>votes[v]===id);
+      return`<button type="button" class="frow vote ${mine===id?'on':''}" data-a="vote" data-id="${id}" ${playing?'':'disabled'}>${av(p)}<div class="fi"><b>${nm(p)}${id===me.id?' (tu)':''}</b><small>${who.length?'Votato da '+who.map(v=>esc(playerOf(v).name)).join(', '):'Nessun voto'}</small></div>${isHost?`<span class="btn sm primary gostart" data-a="begin" data-id="${id}">Inizia</span>`:`<span class="vcount">${who.length}</span>`}</button>`}).join('');
+    const ch=$('#choosehint');if(ch){const n=S.order.filter(id=>votes[id]).length;ch.innerHTML=`<p class="hint" style="margin-top:12px">${playing?(mine?'Hai votato. ':'Tocca chi secondo te deve iniziare. '):''}Quando votate tutti la stessa persona si parte${isHost?', oppure scegli tu con Inizia':''}. Voti: ${n}/${S.order.length}</p>`}
+    setDock(playing?handHtml(S,me.id,false):'<p class="spect">Stai guardando la partita. Entri dalla prossima.</p>');
   }else setDock('');
 }
 
@@ -292,6 +317,8 @@ function act(a,el){
     case 'copy':copyLink();break;
     case 'exit':if(confirm(isHost?"Sei l'host: se esci la partita si ferma per tutti (potrai riprenderla dalla home). Uscire?":'Uscire dal tavolo?')){if(!isHost&&state&&state.phase==='lobby')send({type:'leave'});setTimeout(()=>{leave();goHome()},100)}break;
     case 'start':buzz(30);send({type:'start'});break;
+    case 'vote':buzz(12);SFX.tap();send({type:'vote',id:el.dataset.id});break;
+    case 'begin':buzz(20);send({type:'begin',id:el.dataset.id||null});break;
     case 'opt':{if(!isHost)return;const o=Object.assign({},state.opts);o[el.dataset.k]=!o[el.dataset.k];SFX.tap();send({type:'opts',...o});break}
     case 'kick':send({type:'kick',id:el.dataset.id});break;
     case 'card':{const c=+el.dataset.c;sel=sel===c?null:c;SFX.tap();updateDyn();break}

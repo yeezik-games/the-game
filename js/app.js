@@ -560,9 +560,12 @@ async function scanQR(){
 }
 
 // ===== Versione e patch notes =====
-const VERSION='2.1';
+const VERSION='2.2';
 // tipi di voce: n = nuovo, m = migliorato, c = corretto
 const NOTES=[
+  {v:'2.2',d:'5 novembre 2026',items:[
+    ['n','A inizio partita scegliete voi chi inizia: votate la persona con la mano migliore, oppure a caso']
+  ]},
   {v:'2.1',d:'3 novembre 2026',items:[
     ['c','Sfondo di fuoco senza la riga orizzontale e fermo dietro i contenuti anche su iPhone'],
     ['n','Nuova icona e favicon']

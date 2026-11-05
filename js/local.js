@@ -73,13 +73,17 @@ function startLocal(){
   L.order=L.players.map(p=>p.id);
   TG.deal(L);
   sel=null;lastTops=[];lastHand=null;
-  L.view=L.order.length>1?'pass':'turn';
+  L.view=L.order.length>1?'choose':'turn';
   show('local');buzz(30);
 }
 
 // ----- schermate di gioco -----
 const LP=id=>L.players.find(p=>p.id===id)||{name:'?',color:'#fff'};
 const L_VIEWS={
+  choose:()=>`<div class="choose"><p class="lbl tc">Carte distribuite</p><h1 class="headline tc">Chi inizia?</h1>
+    <p class="sub tc">Decidete insieme chi apre la partita, oppure lasciate fare al caso.</p>
+    <div class="flist">${L.order.map(id=>{const p=LP(id);return`<button type="button" class="frow vote" data-go="l-begin" data-id="${id}">${av(p)}<div class="fi"><b>${nm(p)}</b><small>Tocca per farlo iniziare</small></div><span class="btn sm primary gostart">Inizia</span></button>`}).join('')}</div>
+    <button type="button" class="btn ghost big" data-go="l-begin" data-id="" style="margin-top:14px">🎲 Scegli a caso</button></div>`,
   pass:()=>{const p=LP(TG.cur(L));return`<div class="pass">
     <div class="passicon">${ICON.swap}</div>
     <p class="lbl tc">Passa il telefono a</p>
@@ -140,6 +144,7 @@ const LOCAL_GO={
   'l-del':el=>{lsetup.names.splice(+el.dataset.i,1);refresh()},
   'l-opt':el=>{const k=el.dataset.k;lsetup.opts[k]=!lsetup.opts[k];SFX.tap();refresh()},
   'l-start':()=>startLocal(),
+  'l-begin':el=>{if(!L||!TG.begin(L,el.dataset.id||null))return;buzz(20);SFX.chime();L.view='pass';lastHand=null;lgo()},
   'l-show':()=>{L.view='turn';lastHand=null;sel=null;lgo()},
   card:el=>{if(!L)return;const c=+el.dataset.c;sel=sel===c?null:c;SFX.tap();lDyn()},
   pile:el=>{if(!L||L.phase!=='play')return;if(sel==null){toast('Prima tocca una carta della tua mano');return}

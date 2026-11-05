@@ -708,6 +708,13 @@ body.ingame .ver{display:none}
 .passcards .gc:nth-child(1){transform:rotate(-10deg)}.passcards .gc:nth-child(3){transform:rotate(10deg)}
 .gc.backside{background:radial-gradient(60% 45% at 50% 50%,rgba(255,110,40,.75) 0%,rgba(140,25,10,.6) 50%,transparent 100%),#120403}
 .gc.backside b{font-size:.6em;line-height:1.05;text-align:center;letter-spacing:.02em}
+.frow.vote{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.frow.vote.on{border-color:var(--acc);background:rgba(255,90,31,.14);box-shadow:0 0 16px rgba(255,90,31,.3)}
+.frow.vote:disabled{cursor:default}
+.frow.vote .vcount{min-width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--card2);color:var(--acc2)}
+.frow.vote.on .vcount{background:var(--acc);color:#fff}
+.gostart{flex:none;padding:7px 14px}
+.choose .headline{margin:4px 0 6px}.choose .sub{margin:0 0 16px}
 </style>
 <script src="https://yeezik-games.github.io/hub/hub-link.js" defer></script>
 </head>
@@ -719,11 +726,11 @@ body.ingame .ver{display:none}
 <nav id="tabs" aria-label="Navigazione"></nav>
 <div id="dock" class="dock"></div>
 <div id="toast"></div>
-<script src="js/core.js?v=2.1"></script>
-<script src="js/sfx.js?v=2.1"></script>
-<script src="js/game.js?v=2.1"></script>
-<script src="js/app.js?v=2.1"></script>
-<script src="js/local.js?v=2.1"></script>
-<script src="js/share.js?v=2.1"></script>
+<script src="js/core.js?v=2.2"></script>
+<script src="js/sfx.js?v=2.2"></script>
+<script src="js/game.js?v=2.2"></script>
+<script src="js/app.js?v=2.2"></script>
+<script src="js/local.js?v=2.2"></script>
+<script src="js/share.js?v=2.2"></script>
 </body>
 </html>
